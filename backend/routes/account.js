@@ -1,8 +1,7 @@
 const express = require('express');
 const { authMiddleware } = require('../middleware');
-const { Account } = require('../../database/database');
+const { Account, mongoose } = require('../../database/database');
 const router= express.Router();
-const {default: mongoose} = require('mongoose');
 
 router.get('/balance',authMiddleware,async (req,res)=>{
     const account= await Account.findOne({
@@ -14,14 +13,22 @@ router.get('/balance',authMiddleware,async (req,res)=>{
     })
 });
 
-router.post('transfer',authMiddleware ,async (req,res)=>{
-    const session= await mongoose.startSession();
+router.post('/transfer',authMiddleware ,async (req,res)=>{
+    console.log("Reached here")
 
-    session.startSession();
+    if (!mongoose.connection.readyState) {
+        console.error( 'Mongoose not connected');
+        return res.status(500).json({ message: 'Database connection error' });
+    }
+
+    const session= await mongoose.startSession();
+    console.log("Reached here2")
+    session.startTransaction();
+    console.log("Reached here3")
     const {amount,to}=req.body;
 
     const fromAccount= await Account.findOne({userId: req.userId}).session(session);
-
+    
     if(!fromAccount || fromAccount.balance<amount){
         await session.abortTransaction();
         console.log("Insufficient Balance");
@@ -45,6 +52,10 @@ router.post('transfer',authMiddleware ,async (req,res)=>{
 
     await session.commitTransaction();
     console.log("Transaction Completed");
+
+    return res.status(200).json({
+        message:"Transaction Completed"
+    })
 });
 
 module.exports=router;

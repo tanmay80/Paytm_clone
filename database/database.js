@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb+srv://tanmayaswal80:CozhNFuXZHRka3SR@cluster0.2em89tf.mongodb.net/paytm_database');
+mongoose.connect('mongodb+srv://tanmayaswal80:CozhNFuXZHRka3SR@cluster0.2em89tf.mongodb.net/paytm_database').then(() => {
+    console.log('Mongoose connected successfully');
+}).catch(err => {
+    console.error('Mongoose connection error:', err);
+});;
 
 const userSchema = new mongoose.Schema({
     
@@ -28,4 +32,5 @@ const Account = mongoose.model('Account', accountSchema);
 module.exports={
     User,
     Account,
+    mongoose
 }

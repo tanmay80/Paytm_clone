@@ -23,7 +23,7 @@ export const Signup = () => {
             console.log("API Response:", res);
             if (res.status === 200) {
                 console.log("Successful Signup");
-                // navigate('/dashboard');
+                navigate('/dashboard');
             } else {
                 console.log("Unsuccessful Signup");
             }
